@@ -67,6 +67,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's profile (alias for easier access).
+     */
+    public function userProfile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    /**
      * Get the user's codeforces handles.
      */
     public function codeforcesHandles(): HasMany

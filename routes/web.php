@@ -47,7 +47,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/leaderboard', [PendampingController::class, 'leaderboard'])->name('leaderboard');
         Route::get('/activities', [PendampingController::class, 'activities'])->name('activities');
         Route::get('/contests', [PendampingController::class, 'contests'])->name('contests');
-        Route::post('/contests/{contest}/important', [PendampingController::class, 'markContestImportant'])->name('contests.important');
+        Route::post('/contests/{contest}/important', [PendampingController::class, 'toggleContestImportant'])->name('contests.important');
+        Route::get('/settings', [PendampingController::class, 'settings'])->name('settings');
+        Route::post('/settings/profile', [PendampingController::class, 'updateProfile'])->name('settings.profile');
+        Route::post('/settings/password', [PendampingController::class, 'updatePassword'])->name('settings.password');
+        Route::post('/settings/preferences', [PendampingController::class, 'updatePreferences'])->name('settings.preferences');
+        Route::delete('/settings/delete', [PendampingController::class, 'deleteAccount'])->name('settings.delete');
         Route::post('/refresh-all', [PendampingController::class, 'refreshAllData'])->name('refresh.all');
     });
 });

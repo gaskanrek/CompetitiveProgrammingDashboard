@@ -104,13 +104,114 @@ class PendampingController extends Controller
         $upcomingContests = Contest::where('phase', 'BEFORE')
             ->where('start_time', '>', now())
             ->orderBy('start_time')
-            ->paginate(15);
+            ->get();
 
-        $recentContests = Contest::where('phase', 'FINISHED')
-            ->orderBy('start_time', 'desc')
-            ->paginate(15);
+        $importantContests = Contest::where('is_important', true)
+            ->where('start_time', '>', now())
+            ->orderBy('start_time')
+            ->get();
 
-        return view('pendamping.contests', compact('upcomingContests', 'recentContests'));
+        $recentParticipations = \App\Models\ContestParticipation::with(['codeforcesHandle.user', 'contest'])
+            ->orderBy('participation_time', 'desc')
+            ->get();
+
+        return view('pendamping.contests', compact('upcomingContests', 'importantContests', 'recentParticipations'));
+    }
+
+    public function settings()
+    {
+        $mahasiswaRole = \App\Models\Role::where('name', 'mahasiswa')->first();
+        $mahasiswaCount = User::where('role_id', $mahasiswaRole->id)->count();
+        $activeMahasiswaCount = User::where('role_id', $mahasiswaRole->id)
+            ->whereHas('primaryCodeforcesHandle', function($query) {
+                $query->where('is_active', true);
+            })->count();
+        
+        $totalContests = \App\Models\ContestParticipation::whereHas('codeforcesHandle.user', function($query) use ($mahasiswaRole) {
+            $query->where('role_id', $mahasiswaRole->id);
+        })->distinct('contest_id')->count();
+
+        return view('pendamping.settings', compact('mahasiswaCount', 'activeMahasiswaCount', 'totalContests'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'angkatan' => 'nullable|string|max:10',
+            'jurusan' => 'nullable|string|max:255',
+        ]);
+
+        $user = Auth::user();
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        if ($user->userProfile && ($request->angkatan || $request->jurusan)) {
+            $user->userProfile->update([
+                'angkatan' => $request->angkatan,
+                'jurusan' => $request->jurusan,
+            ]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Profil berhasil diperbarui']);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        if (!\Hash::check($request->current_password, Auth::user()->password)) {
+            return response()->json(['success' => false, 'message' => 'Password saat ini tidak benar']);
+        }
+
+        Auth::user()->update([
+            'password' => \Hash::make($request->new_password),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Password berhasil diubah']);
+    }
+
+    public function updatePreferences(Request $request)
+    {
+        // Store preferences in session for now
+        session([
+            'dashboard_theme' => $request->theme,
+            'items_per_page' => $request->items_per_page,
+            'auto_refresh' => $request->has('auto_refresh'),
+            'show_animations' => $request->has('show_animations'),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Preferensi berhasil disimpan']);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Logout user first
+        Auth::logout();
+        
+        // Delete user account
+        $user->delete();
+
+        return response()->json(['success' => true, 'message' => 'Akun berhasil dihapus']);
+    }
+
+    public function toggleContestImportant(Request $request, $contestId)
+    {
+        $contest = Contest::findOrFail($contestId);
+        $contest->update(['is_important' => $request->is_important]);
+
+        return response()->json([
+            'success' => true, 
+            'message' => $request->is_important ? 'Kontes ditandai sebagai penting' : 'Kontes dihapus dari daftar penting'
+        ]);
     }
 
     public function refreshAllData()

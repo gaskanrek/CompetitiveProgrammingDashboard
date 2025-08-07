@@ -15,13 +15,13 @@ class ProfileController extends Controller
 
     public function show()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load(['role', 'userProfile', 'primaryCodeforcesHandle']);
         return view('profile.show', compact('user'));
     }
 
     public function edit()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load(['role', 'userProfile']);
         return view('profile.edit', compact('user'));
     }
 
@@ -58,10 +58,10 @@ class ProfileController extends Controller
             'graduation_year' => $request->graduation_year,
         ];
 
-        if ($user->profile) {
-            $user->profile->update($profileData);
+        if ($user->userProfile) {
+            $user->userProfile->update($profileData);
         } else {
-            $user->profile()->create(array_merge($profileData, ['user_id' => $user->id]));
+            $user->userProfile()->create($profileData);
         }
 
         return redirect()->route('profile.show')->with('success', 'Profile berhasil diperbarui!');

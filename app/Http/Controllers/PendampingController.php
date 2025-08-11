@@ -86,15 +86,15 @@ class PendampingController extends Controller
         return view('pendamping.leaderboard', compact('leaderboard'));
     }
 
-    public function activities()
+    public function activities(Request $request)
     {
         $recentSubmissions = \App\Models\Submission::with(['codeforcesHandle.user.profile', 'problem.contest'])
             ->orderBy('creation_time', 'desc')
-            ->paginate(30);
+            ->paginate(30, ['*'], 'submissions_page');
 
         $recentRatingChanges = \App\Models\RatingHistory::with(['codeforcesHandle.user.profile', 'contest'])
             ->orderBy('rating_update_time', 'desc')
-            ->paginate(20);
+            ->paginate(20, ['*'], 'rating_page');
 
         return view('pendamping.activities', compact('recentSubmissions', 'recentRatingChanges'));
     }

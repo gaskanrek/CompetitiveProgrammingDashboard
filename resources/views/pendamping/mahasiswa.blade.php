@@ -139,7 +139,7 @@
                         
                         <!-- Pagination -->
                         <div class="card-footer">
-                            {{ $mahasiswaUsers->links() }}
+                            {{ $mahasiswaUsers->links('pagination.custom') }}
                         </div>
                     @else
                         <div class="text-center py-5">

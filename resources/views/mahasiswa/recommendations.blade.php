@@ -144,7 +144,7 @@
                     </table>
                 </div>
                 
-                {{ $recommendedProblems->links() }}
+                {{ $recommendedProblems->links('pagination.custom') }}
             @else
                 <div class="text-center py-4">
                     <i class="bi bi-check-circle display-4 text-success"></i>

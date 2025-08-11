@@ -264,9 +264,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const activeTab = urlParams.get('tab');
     
     if (activeTab) {
-        // Remove active class from all tabs and tab panes
-        document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(pane => {
+        // Remove active class from all tabs and tab panes (only in tab container)
+        document.querySelectorAll('#activityTabs .nav-link').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('#activityTabsContent .tab-pane').forEach(pane => {
             pane.classList.remove('show', 'active');
         });
         
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Update URL when tab is clicked
-    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+    document.querySelectorAll('#activityTabs [data-bs-toggle="tab"]').forEach(tab => {
         tab.addEventListener('click', function() {
             const target = this.getAttribute('data-bs-target').substring(1);
             const url = new URL(window.location);

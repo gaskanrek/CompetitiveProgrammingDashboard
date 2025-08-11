@@ -116,7 +116,7 @@
                         
                         <!-- Pagination -->
                         <div class="card-footer">
-                            {{ $leaderboard->links() }}
+                            {{ $leaderboard->links('pagination.custom') }}
                         </div>
                     @else
                         <div class="text-center py-5">

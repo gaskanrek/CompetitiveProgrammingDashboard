@@ -16,9 +16,24 @@
         </div>
     </div>
 
-    <div class="row">
-        <!-- Recent Submissions -->
-        <div class="col-lg-8 mb-4">
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="activityTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="submissions-tab" data-bs-toggle="tab" data-bs-target="#submissions" type="button" role="tab">
+                <i class="bi bi-code-slash me-2"></i>Submission Terbaru
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rating-tab" data-bs-toggle="tab" data-bs-target="#rating" type="button" role="tab">
+                <i class="bi bi-graph-up me-2"></i>Perubahan Rating
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="activityTabsContent">
+        <!-- Submissions Tab -->
+        <div class="tab-pane fade show active" id="submissions" role="tabpanel">
             <div class="card">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
@@ -85,7 +100,7 @@
                         
                         <!-- Pagination -->
                         <div class="card-footer">
-                            {{ $recentSubmissions->links() }}
+                            {{ $recentSubmissions->appends(['tab' => 'submissions'])->links('pagination.custom') }}
                         </div>
                     @else
                         <div class="text-center py-5">
@@ -98,8 +113,8 @@
             </div>
         </div>
 
-        <!-- Recent Rating Changes -->
-        <div class="col-lg-4 mb-4">
+        <!-- Rating Changes Tab -->
+        <div class="tab-pane fade" id="rating" role="tabpanel">
             <div class="card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
@@ -110,24 +125,42 @@
                 <div class="card-body p-0">
                     @if($recentRatingChanges->count() > 0)
                         <div class="table-responsive">
-                            <table class="table table-sm mb-0">
+                            <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Mahasiswa</th>
-                                        <th>Rating</th>
-                                        <th>Perubahan</th>
+                                        <th width="30%">Mahasiswa</th>
+                                        <th width="20%">Contest</th>
+                                        <th width="15%">Old Rating</th>
+                                        <th width="15%">New Rating</th>
+                                        <th width="15%">Perubahan</th>
+                                        <th width="15%">Tanggal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($recentRatingChanges->take(10) as $rating)
+                                    @foreach($recentRatingChanges as $rating)
                                     <tr>
                                         <td>
-                                            <div>
-                                                <div class="fw-semibold small">{{ $rating->codeforcesHandle->user->name ?? 'Unknown' }}</div>
-                                                <div class="text-muted small">{{ $rating->codeforcesHandle->handle }}</div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">
+                                                    {{ strtoupper(substr($rating->codeforcesHandle->user->name ?? 'N', 0, 2)) }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold small">{{ $rating->codeforcesHandle->user->name ?? 'Unknown' }}</div>
+                                                    <div class="text-muted small">{{ $rating->codeforcesHandle->handle }}</div>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td class="fw-semibold">{{ $rating->new_rating }}</td>
+                                        <td>
+                                            @if($rating->contest)
+                                                <a href="https://codeforces.com/contest/{{ $rating->contest->contest_id }}" target="_blank" class="text-decoration-none">
+                                                    <div class="fw-semibold small">{{ Str::limit($rating->contest->name, 20) }}</div>
+                                                </a>
+                                            @else
+                                                <span class="text-muted small">Contest {{ $rating->contest_id }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="fw-semibold">{{ number_format($rating->old_rating) }}</td>
+                                        <td class="fw-semibold">{{ number_format($rating->new_rating) }}</td>
                                         <td>
                                             @php
                                                 $change = $rating->new_rating - $rating->old_rating;
@@ -136,21 +169,24 @@
                                                 {{ $change >= 0 ? '+' : '' }}{{ $change }}
                                             </span>
                                         </td>
+                                        <td class="text-muted small">
+                                            {{ $rating->rating_update_time->diffForHumans() }}
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                         
-                        @if($recentRatingChanges->count() > 10)
+                        <!-- Pagination -->
                         <div class="card-footer">
-                            <a href="#" class="text-decoration-none">Lihat semua perubahan rating</a>
+                            {{ $recentRatingChanges->appends(['tab' => 'rating'])->links('pagination.custom') }}
                         </div>
-                        @endif
                     @else
-                        <div class="text-center py-4">
-                            <i class="bi bi-graph-up display-6 text-muted"></i>
-                            <p class="text-muted mt-2">Belum ada perubahan rating</p>
+                        <div class="text-center py-5">
+                            <i class="bi bi-graph-up display-4 text-muted"></i>
+                            <h5 class="mt-3">Belum Ada Perubahan Rating</h5>
+                            <p class="text-muted">Belum ada perubahan rating dari mahasiswa.</p>
                         </div>
                     @endif
                 </div>
@@ -243,4 +279,39 @@ function getVerdictBadgeClass($verdict) {
     }
 }
 @endphp
+
+<script>
+// Handle tab switching based on URL parameter
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+    
+    if (activeTab) {
+        // Remove active class from all tabs and tab panes (only in tab container)
+        document.querySelectorAll('#activityTabs .nav-link').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('#activityTabsContent .tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        
+        // Activate the correct tab
+        const targetTab = document.getElementById(activeTab + '-tab');
+        const targetPane = document.getElementById(activeTab);
+        
+        if (targetTab && targetPane) {
+            targetTab.classList.add('active');
+            targetPane.classList.add('show', 'active');
+        }
+    }
+    
+    // Update URL when tab is clicked
+    document.querySelectorAll('#activityTabs [data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const target = this.getAttribute('data-bs-target').substring(1);
+            const url = new URL(window.location);
+            url.searchParams.set('tab', target);
+            window.history.replaceState({}, '', url);
+        });
+    });
+});
+</script>
 @endsection

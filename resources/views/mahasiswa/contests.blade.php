@@ -162,7 +162,7 @@
                 @endforeach
             </div>
             
-            {{ $upcomingContests->links() }}
+            {{ $upcomingContests->links('pagination.custom') }}
         @else
             <div class="text-center py-5">
                 <i class="bi bi-calendar-x display-4 text-muted"></i>

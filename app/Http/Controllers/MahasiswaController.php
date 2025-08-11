@@ -71,7 +71,7 @@ class MahasiswaController extends Controller
         return redirect()->back()->with('success', 'Data berhasil diperbarui!');
     }
 
-    public function activity()
+    public function activity(Request $request)
     {
         $user = Auth::user();
         $handle = $user->primaryCodeforcesHandle;
@@ -81,20 +81,21 @@ class MahasiswaController extends Controller
                 ->with('error', 'Anda belum memiliki handle Codeforces!');
         }
 
+        // Paginate with different page parameters for each tab
         $submissions = $handle->submissions()
             ->with('problem.contest')
             ->orderBy('creation_time', 'desc')
-            ->paginate(20);
+            ->paginate(20, ['*'], 'submissions_page');
 
         $ratingHistory = $handle->ratingHistories()
             ->with('contest')
             ->orderBy('rating_update_time', 'desc')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'rating_page');
 
         $contestParticipations = $handle->contestParticipations()
             ->with('contest')
             ->orderBy('participation_time', 'desc')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'contests_page');
 
         return view('mahasiswa.activity', compact(
             'handle',

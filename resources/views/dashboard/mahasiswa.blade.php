@@ -107,7 +107,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Submission Terbaru</h5>
-                    <a href="{{ route('mahasiswa.activity') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('mahasiswa.activity', ['tab' => 'submissions']) }}" class="btn btn-sm btn-outline-primary">
                         Lihat Semua
                     </a>
                 </div>
@@ -186,7 +186,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Riwayat Rating</h5>
-                    <a href="{{ route('mahasiswa.activity') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('mahasiswa.activity', ['tab' => 'rating']) }}" class="btn btn-sm btn-outline-primary">
                         Lihat Semua
                     </a>
                 </div>

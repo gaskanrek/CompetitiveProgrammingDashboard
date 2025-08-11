@@ -97,7 +97,9 @@
                             </table>
                         </div>
                         
-                        {{ $submissions->links() }}
+                        <div class="d-flex justify-content-center">
+                            {{ $submissions->appends(request()->except('submissions_page'))->appends(['tab' => 'submissions'])->links('pagination.custom') }}
+                        </div>
                     @else
                         <div class="text-center py-4">
                             <i class="bi bi-code-slash display-4 text-muted"></i>
@@ -175,7 +177,9 @@
                             </table>
                         </div>
                         
-                        {{ $ratingHistory->links() }}
+                        <div class="d-flex justify-content-center">
+                            {{ $ratingHistory->appends(request()->except('rating_page'))->appends(['tab' => 'rating'])->links('pagination.custom') }}
+                        </div>
                     @else
                         <div class="text-center py-4">
                             <i class="bi bi-graph-up display-4 text-muted"></i>
@@ -237,7 +241,9 @@
                             </table>
                         </div>
                         
-                        {{ $contestParticipations->links() }}
+                        <div class="d-flex justify-content-center">
+                            {{ $contestParticipations->appends(request()->except('contests_page'))->appends(['tab' => 'contests'])->links('pagination.custom') }}
+                        </div>
                     @else
                         <div class="text-center py-4">
                             <i class="bi bi-trophy display-4 text-muted"></i>
@@ -250,4 +256,80 @@
         </div>
     </div>
 @endif
+
+<script>
+// Handle tab switching based on URL parameter
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+    
+    if (activeTab) {
+        // Remove active class from all tabs and tab panes
+        document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+        });
+        
+        // Activate the correct tab
+        const targetTab = document.getElementById(activeTab + '-tab');
+        const targetPane = document.getElementById(activeTab);
+        
+        if (targetTab && targetPane) {
+            targetTab.classList.add('active');
+            targetPane.classList.add('show', 'active');
+        }
+    }
+    
+    // Update URL when tab is clicked
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const target = this.getAttribute('data-bs-target').substring(1);
+            const url = new URL(window.location);
+            url.searchParams.set('tab', target);
+            window.history.replaceState({}, '', url);
+        });
+    });
+});
+</script>
+
+<style>
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.25;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    background-color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+}
+
+.page-link:hover {
+    color: #0056b3;
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+}
+</style>
 @endsection

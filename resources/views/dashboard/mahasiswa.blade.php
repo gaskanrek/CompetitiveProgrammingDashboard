@@ -181,6 +181,74 @@
 
     <!-- Right Column -->
     <div class="col-md-4">
+        <!-- Leaderboard -->
+        @if($leaderboard->count() > 0)
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy me-2"></i>Leaderboard
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">#</th>
+                                    <th>Mahasiswa</th>
+                                    <th>Handle</th>
+                                    <th>Rating</th>
+                                    <th>Rank</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($leaderboard as $index => $handle)
+                                    <tr>
+                                        <td class="ps-3">
+                                            @if($index + 1 <= 3)
+                                                <span class="badge bg-{{ $index + 1 == 1 ? 'warning' : ($index + 1 == 2 ? 'secondary' : 'dark') }}">
+                                                    {{ $index + 1 }}
+                                                </span>
+                                            @else
+                                                {{ $index + 1 }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <div class="fw-medium">{{ $handle->user->name }}</div>
+                                                    @if($handle->user->profile)
+                                                        <small class="text-muted">{{ $handle->user->profile->angkatan ?? '' }}</small>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="https://codeforces.com/profile/{{ $handle->handle }}" 
+                                               target="_blank" 
+                                               class="text-decoration-none fw-medium">
+                                                {{ $handle->handle }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold" style="color: {{ $handle->rating_color }}">
+                                                {{ number_format($handle->current_rating) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" style="background-color: {{ $handle->rank_color }}; color: white;">
+                                                {{ $handle->rank }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if($codeforcesHandle && $ratingHistory->count() > 0)
             <!-- Rating History -->
             <div class="card mb-4">

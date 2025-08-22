@@ -40,6 +40,13 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Get leaderboard data (top 5)
+        $leaderboard = CodeforcesHandle::with('user.profile')
+            ->where('is_active', true)
+            ->orderBy('current_rating', 'desc')
+            ->limit(5)
+            ->get();
+
         // Recent submissions if user has handle
         $recentSubmissions = collect();
         $ratingHistory = collect();
@@ -66,7 +73,8 @@ class DashboardController extends Controller
             'upcomingContests',
             'recentSubmissions',
             'ratingHistory',
-            'solvedProblemsCount'
+            'solvedProblemsCount',
+            'leaderboard'
         ));
     }
 

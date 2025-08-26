@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/preferences', [PendampingController::class, 'updatePreferences'])->name('settings.preferences');
         Route::delete('/settings/delete', [PendampingController::class, 'deleteAccount'])->name('settings.delete');
         Route::post('/refresh-all', [PendampingController::class, 'refreshAllData'])->name('refresh.all');
+        Route::post('/refresh-batch', [PendampingController::class, 'refreshBatchData'])->name('refresh.batch');
     });
 });
 

@@ -222,29 +222,97 @@ async function refreshAllData() {
         button.innerHTML = '<i class="bi bi-arrow-clockwise spinner-border spinner-border-sm"></i> Refreshing...';
         button.disabled = true;
         
-        const response = await fetch('{{ route("pendamping.refresh.all") }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
+        // Get total count first
+        const totalHandles = {{ \App\Models\CodeforcesHandle::where('is_active', true)->count() }};
         
-        const result = await response.json();
-        
-        if (result.success) {
-            showAlert('success', 'Semua data berhasil direfresh!');
-            setTimeout(() => location.reload(), 2000);
-        } else {
-            showAlert('error', result.message || 'Gagal refresh data');
+        if (totalHandles === 0) {
+            showAlert('warning', 'Tidak ada handle aktif untuk direfresh');
+            return;
         }
+        
+        if (totalHandles <= 5) {
+            // For small numbers, use the original method
+            const response = await fetch('{{ route("pendamping.refresh.all") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showAlert('success', 'Semua data berhasil direfresh!');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showAlert('error', result.message || 'Gagal refresh data');
+            }
+        } else {
+            // For larger numbers, use batch processing
+            await refreshInBatches(totalHandles, button);
+        }
+        
     } catch (error) {
         console.error('Error:', error);
         showAlert('error', 'Terjadi kesalahan saat refresh data');
     } finally {
         button.innerHTML = originalHtml;
         button.disabled = false;
+    }
+}
+
+async function refreshInBatches(totalHandles, button) {
+    let offset = 0;
+    const batchSize = 3;
+    let processed = 0;
+    
+    while (offset < totalHandles) {
+        try {
+            button.innerHTML = `<i class="bi bi-arrow-clockwise spinner-border spinner-border-sm"></i> Refreshing... (${processed}/${totalHandles})`;
+            
+            const response = await fetch('{{ route("pendamping.refresh.batch") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    offset: offset,
+                    batch_size: batchSize
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Batch refresh failed');
+            }
+            
+            processed += result.processed;
+            
+            if (result.errors && result.errors.length > 0) {
+                console.warn('Some errors occurred:', result.errors);
+            }
+            
+            if (result.completed) {
+                showAlert('success', `Semua ${processed} data berhasil direfresh!`);
+                setTimeout(() => location.reload(), 2000);
+                break;
+            }
+            
+            offset = result.next_offset;
+            
+            // Small delay between batches
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+        } catch (error) {
+            console.error('Batch error:', error);
+            showAlert('error', `Error saat refresh batch: ${error.message}`);
+            break;
+        }
     }
 }
 

@@ -216,10 +216,93 @@ class PendampingController extends Controller
 
     public function refreshAllData()
     {
-        // Trigger crawling untuk semua user
-        \Artisan::call('codeforces:crawl-all');
+        // Set maximum execution time for this process
+        set_time_limit(300); // 5 minutes
+        
+        try {
+            // Get count of active handles first
+            $activeHandlesCount = CodeforcesHandle::where('is_active', true)->count();
+            
+            if ($activeHandlesCount == 0) {
+                if (request()->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Tidak ada handle Codeforces aktif untuk direfresh.']);
+                }
+                return redirect()->back()->with('warning', 'Tidak ada handle Codeforces aktif untuk direfresh.');
+            }
+            
+            // For small numbers, run directly with increased time limit
+            if ($activeHandlesCount <= 5) {
+                \Artisan::call('codeforces:crawl-all');
+                
+                if (request()->expectsJson()) {
+                    return response()->json(['success' => true, 'message' => 'Proses refresh data untuk semua mahasiswa telah selesai!']);
+                }
+                return redirect()->back()->with('success', 'Proses refresh data untuk semua mahasiswa telah selesai!');
+            }
+            
+            // For larger numbers, try to run in background
+            try {
+                \Artisan::queue('codeforces:crawl-all');
+                $message = "Proses refresh data untuk {$activeHandlesCount} mahasiswa telah dimulai di background! Silakan tunggu beberapa menit dan refresh halaman.";
+            } catch (\Exception $e) {
+                // Fallback: run synchronously with increased time limit
+                \Artisan::call('codeforces:crawl-all');
+                $message = 'Proses refresh data untuk semua mahasiswa telah selesai!';
+            }
+            
+            if (request()->expectsJson()) {
+                return response()->json(['success' => true, 'message' => $message]);
+            }
+            return redirect()->back()->with('success', $message);
+            
+        } catch (\Exception $e) {
+            $errorMessage = 'Terjadi error saat refresh data: ' . $e->getMessage();
+            
+            if (request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMessage]);
+            }
+            return redirect()->back()->with('error', $errorMessage);
+        }
+    }
 
-        return redirect()->back()->with('success', 'Proses refresh data untuk semua mahasiswa telah dimulai!');
+    public function refreshBatchData(Request $request)
+    {
+        $batchSize = $request->get('batch_size', 3);
+        $offset = $request->get('offset', 0);
+        
+        $activeHandles = CodeforcesHandle::where('is_active', true)
+            ->skip($offset)
+            ->take($batchSize)
+            ->get();
+            
+        if ($activeHandles->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'completed' => true,
+                'message' => 'Semua data telah direfresh!'
+            ]);
+        }
+        
+        $processed = 0;
+        $errors = [];
+        
+        foreach ($activeHandles as $handle) {
+            try {
+                \Artisan::call('codeforces:crawl-user', ['handle' => $handle->handle]);
+                $processed++;
+                sleep(1); // Delay to avoid rate limiting
+            } catch (\Exception $e) {
+                $errors[] = "Error refreshing {$handle->handle}: " . $e->getMessage();
+            }
+        }
+        
+        return response()->json([
+            'success' => true,
+            'completed' => false,
+            'processed' => $processed,
+            'errors' => $errors,
+            'next_offset' => $offset + $batchSize
+        ]);
     }
 
     public function refreshUserData($userId)

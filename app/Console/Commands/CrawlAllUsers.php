@@ -27,6 +27,9 @@ class CrawlAllUsers extends Command
      */
     public function handle()
     {
+        // Set maximum execution time
+        set_time_limit(600); // 10 minutes
+        
         $this->info('Starting crawling for all active users...');
 
         $activeHandles = CodeforcesHandle::where('is_active', true)->get();
@@ -41,6 +44,9 @@ class CrawlAllUsers extends Command
         $bar = $this->output->createProgressBar($activeHandles->count());
         $bar->start();
 
+        $successCount = 0;
+        $errorCount = 0;
+
         foreach ($activeHandles as $handle) {
             try {
                 $this->info("\nCrawling data for: {$handle->handle}");
@@ -50,17 +56,24 @@ class CrawlAllUsers extends Command
                     'handle' => $handle->handle
                 ]);
                 
+                $successCount++;
+                
                 // Add delay to avoid hitting API rate limits
-                sleep(1);
+                sleep(2); // Increased delay to be safer
                 
             } catch (\Exception $e) {
+                $errorCount++;
                 $this->error("\nError crawling {$handle->handle}: " . $e->getMessage());
+                
+                // Continue with next handle even if one fails
+                continue;
             }
             
             $bar->advance();
         }
 
         $bar->finish();
-        $this->info("\nCrawling completed for all users!");
+        $this->info("\nCrawling completed!");
+        $this->info("Successful: {$successCount}, Errors: {$errorCount}");
     }
 }

@@ -106,16 +106,7 @@ class PendampingController extends Controller
             ->orderBy('start_time')
             ->get();
 
-        $importantContests = Contest::where('is_important', true)
-            ->where('start_time', '>', now())
-            ->orderBy('start_time')
-            ->get();
-
-        $recentParticipations = \App\Models\ContestParticipation::with(['codeforcesHandle.user', 'contest'])
-            ->orderBy('participation_time', 'desc')
-            ->get();
-
-        return view('pendamping.contests', compact('upcomingContests', 'importantContests', 'recentParticipations'));
+        return view('pendamping.contests', compact('upcomingContests'));
     }
 
     public function settings()
@@ -319,5 +310,52 @@ class PendampingController extends Controller
         $contest->update(['is_important' => $request->is_important]);
 
         return redirect()->back()->with('success', 'Status kontes berhasil diperbarui!');
+    }
+
+    public function deleteUser($userId)
+    {
+        try {
+            $mahasiswaRole = Role::where('name', 'mahasiswa')->first();
+            $user = User::where('id', $userId)
+                ->where('role_id', $mahasiswaRole->id)
+                ->firstOrFail();
+
+            $userName = $user->name;
+            
+            // Delete semua data terkait user
+            // 1. Delete submissions melalui codeforces handles
+            if ($user->codeforcesHandles) {
+                foreach ($user->codeforcesHandles as $handle) {
+                    // Delete submissions
+                    $handle->submissions()->delete();
+                    // Delete rating histories
+                    $handle->ratingHistories()->delete();
+                    // Delete contest participations
+                    $handle->contestParticipations()->delete();
+                }
+                
+                // Delete codeforces handles
+                $user->codeforcesHandles()->delete();
+            }
+            
+            // 2. Delete user profile
+            if ($user->profile) {
+                $user->profile->delete();
+            }
+            
+            // 3. Delete user
+            $user->delete();
+
+            return response()->json([
+                'success' => true, 
+                'message' => "Akun {$userName} berhasil dihapus beserta semua data terkait!"
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Gagal menghapus akun: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -15,11 +15,6 @@
             <h2 class="mb-1">👤 Detail Mahasiswa</h2>
             <p class="text-muted mb-0">Informasi lengkap dan aktivitas competitive programming</p>
         </div>
-        <div>
-            <button type="button" class="btn btn-primary" onclick="refreshUserData()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh Data
-            </button>
-        </div>
     </div>
 
     <!-- Profile Card -->
@@ -292,57 +287,6 @@
 </div>
 
 <script>
-async function refreshUserData() {
-    const button = event.target.closest('button');
-    const originalHtml = button.innerHTML;
-    
-    try {
-        button.innerHTML = '<i class="bi bi-arrow-clockwise spinner-border spinner-border-sm"></i> Refreshing...';
-        button.disabled = true;
-        
-        const response = await fetch('{{ route("pendamping.mahasiswa.refresh", $mahasiswa->id) }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showAlert('success', 'Data berhasil direfresh!');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showAlert('error', result.message || 'Gagal refresh data');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showAlert('error', 'Terjadi kesalahan saat refresh data');
-    } finally {
-        button.innerHTML = originalHtml;
-        button.disabled = false;
-    }
-}
-
-function showAlert(type, message) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    document.body.appendChild(alertDiv);
-    
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
-        }
-    }, 5000);
-}
-
 @php
 function getVerdictBadgeClass($verdict) {
     switch($verdict) {

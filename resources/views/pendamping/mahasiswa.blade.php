@@ -120,9 +120,9 @@
                                                    class="btn btn-outline-primary" title="Lihat Detail">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-outline-info" 
-                                                        onclick="refreshUserData({{ $mahasiswa->id }})" title="Refresh Data">
-                                                    <i class="bi bi-arrow-clockwise"></i>
+                                                <button type="button" class="btn btn-outline-danger" 
+                                                        onclick="confirmDeleteUser({{ $mahasiswa->id }}, '{{ $mahasiswa->name }}')" title="Hapus Akun">
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -175,16 +175,22 @@
 </style>
 
 <script>
-async function refreshUserData(userId) {
+function confirmDeleteUser(userId, userName) {
+    if (confirm(`Apakah Anda yakin ingin menghapus akun "${userName}"?\n\nPeringatan: Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data mahasiswa termasuk:\n- Data profil\n- Handle Codeforces\n- Riwayat submission\n- Riwayat rating\n- Partisipasi kontes`)) {
+        deleteUser(userId);
+    }
+}
+
+async function deleteUser(userId) {
     const button = event.target.closest('button');
     const originalHtml = button.innerHTML;
     
     try {
-        button.innerHTML = '<i class="bi bi-arrow-clockwise spinner-border spinner-border-sm"></i>';
+        button.innerHTML = '<i class="bi bi-trash spinner-border spinner-border-sm"></i>';
         button.disabled = true;
         
-        const response = await fetch(`{{ url('pendamping/mahasiswa') }}/${userId}/refresh`, {
-            method: 'POST',
+        const response = await fetch(`{{ url('pendamping/mahasiswa') }}/${userId}/delete`, {
+            method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Accept': 'application/json',
@@ -195,14 +201,14 @@ async function refreshUserData(userId) {
         const result = await response.json();
         
         if (result.success) {
-            showAlert('success', 'Data berhasil direfresh!');
+            showAlert('success', 'Akun mahasiswa berhasil dihapus!');
             setTimeout(() => location.reload(), 1500);
         } else {
-            showAlert('error', result.message || 'Gagal refresh data');
+            showAlert('error', result.message || 'Gagal menghapus akun');
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlert('error', 'Terjadi kesalahan saat refresh data');
+        showAlert('error', 'Terjadi kesalahan saat menghapus akun');
     } finally {
         button.innerHTML = originalHtml;
         button.disabled = false;

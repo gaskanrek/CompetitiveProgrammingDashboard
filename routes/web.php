@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/mahasiswa', [PendampingController::class, 'mahasiswa'])->name('mahasiswa');
         Route::get('/mahasiswa/{id}', [PendampingController::class, 'mahasiswaDetail'])->name('mahasiswa.detail');
         Route::post('/mahasiswa/{id}/refresh', [PendampingController::class, 'refreshUserData'])->name('mahasiswa.refresh');
+        Route::delete('/mahasiswa/{id}/delete', [PendampingController::class, 'deleteUser'])->name('mahasiswa.delete');
         Route::get('/leaderboard', [PendampingController::class, 'leaderboard'])->name('leaderboard');
         Route::get('/activities', [PendampingController::class, 'activities'])->name('activities');
         Route::get('/contests', [PendampingController::class, 'contests'])->name('contests');

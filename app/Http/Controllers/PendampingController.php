@@ -217,51 +217,40 @@ class PendampingController extends Controller
     public function refreshAllData()
     {
         // Set maximum execution time for this process
-        set_time_limit(300); // 5 minutes
+        set_time_limit(600); // 10 minutes untuk safety
         
         try {
             // Get count of active handles first
             $activeHandlesCount = CodeforcesHandle::where('is_active', true)->count();
             
             if ($activeHandlesCount == 0) {
-                if (request()->expectsJson()) {
-                    return response()->json(['success' => false, 'message' => 'Tidak ada handle Codeforces aktif untuk direfresh.']);
-                }
-                return redirect()->back()->with('warning', 'Tidak ada handle Codeforces aktif untuk direfresh.');
-            }
-            
-            // For small numbers, run directly with increased time limit
-            if ($activeHandlesCount <= 5) {
-                \Artisan::call('codeforces:crawl-all');
+                // Still refresh contests even if no active handles
+                \Artisan::call('codeforces:crawl-contests');
                 
                 if (request()->expectsJson()) {
-                    return response()->json(['success' => true, 'message' => 'Proses refresh data untuk semua mahasiswa telah selesai!']);
+                    return response()->json(['success' => true, 'message' => 'Contest data refreshed']);
                 }
-                return redirect()->back()->with('success', 'Proses refresh data untuk semua mahasiswa telah selesai!');
+                return redirect()->back()->with('success', 'Contest data refreshed');
             }
             
-            // For larger numbers, try to run in background
-            try {
-                \Artisan::queue('codeforces:crawl-all');
-                $message = "Proses refresh data untuk {$activeHandlesCount} mahasiswa telah dimulai di background! Silakan tunggu beberapa menit dan refresh halaman.";
-            } catch (\Exception $e) {
-                // Fallback: run synchronously with increased time limit
-                \Artisan::call('codeforces:crawl-all');
-                $message = 'Proses refresh data untuk semua mahasiswa telah selesai!';
-            }
+            // Selalu refresh synchronous (foreground) seperti dashboard mahasiswa
+            \Artisan::call('codeforces:crawl-all');
             
             if (request()->expectsJson()) {
-                return response()->json(['success' => true, 'message' => $message]);
+                return response()->json(['success' => true, 'message' => 'All data refreshed successfully']);
             }
-            return redirect()->back()->with('success', $message);
+            return redirect()->back()->with('success', 'All data refreshed successfully');
             
         } catch (\Exception $e) {
-            $errorMessage = 'Terjadi error saat refresh data: ' . $e->getMessage();
+            \Log::error('Refresh error: ' . $e->getMessage());
             
             if (request()->expectsJson()) {
-                return response()->json(['success' => false, 'message' => $errorMessage]);
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Terjadi error saat refresh data: ' . $e->getMessage()
+                ], 500);
             }
-            return redirect()->back()->with('error', $errorMessage);
+            return redirect()->back()->with('error', 'Terjadi error saat refresh data: ' . $e->getMessage());
         }
     }
 

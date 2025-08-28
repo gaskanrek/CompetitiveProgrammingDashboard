@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contests', function (Blueprint $table) {
-            $table->boolean('is_important')->default(false)->after('frozen');
+        Schema::table('submissions', function (Blueprint $table) {
+            $table->string('verdict', 50)->change(); // Extend from default to 50 characters
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('contests', function (Blueprint $table) {
-            $table->dropColumn('is_important');
+        Schema::table('submissions', function (Blueprint $table) {
+            $table->string('verdict')->change(); // Back to default
         });
     }
 };

@@ -9,11 +9,6 @@
             <h2 class="mb-1">📊 Aktivitas Terkini</h2>
             <p class="text-muted mb-0">Monitor aktivitas real-time mahasiswa dalam competitive programming</p>
         </div>
-        <div>
-            <button type="button" class="btn btn-primary" onclick="location.reload()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh
-            </button>
-        </div>
     </div>
 
     <!-- Tabs Navigation -->

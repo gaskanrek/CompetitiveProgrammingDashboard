@@ -6,12 +6,9 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Dashboard Pendamping</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <form action="{{ route('pendamping.refresh.all') }}" method="POST" class="d-inline">
-            @csrf
-            <button type="submit" class="btn btn-primary" onclick="return confirm('Refresh data semua mahasiswa? Proses ini mungkin memakan waktu lama.')">
-                <i class="bi bi-arrow-clockwise me-2"></i>Refresh Semua Data
-            </button>
-        </form>
+        <button type="button" class="btn btn-primary" onclick="refreshAllData()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh Semua Data
+        </button>
     </div>
 </div>
 
@@ -267,3 +264,84 @@
     </div>
 </div>
 @endsection
+
+<script>
+async function refreshAllData() {
+    console.log('refreshAllData function called');
+    
+    // Cari tombol berdasarkan onclick attribute jika event.target tidak tersedia
+    const button = event?.target || document.querySelector('button[onclick="refreshAllData()"]');
+    if (!button) {
+        console.error('Button not found');
+        showAlert('error', 'Tombol tidak ditemukan');
+        return;
+    }
+    
+    console.log('Button found:', button);
+    
+    const originalHtml = button.innerHTML;
+    
+    try {
+        button.innerHTML = '<i class="bi bi-arrow-clockwise spinner-border spinner-border-sm"></i> Refreshing...';
+        button.disabled = true;
+        
+        console.log('Starting foreground refresh process...');
+        
+        // Refresh foreground - tunggu sampai selesai
+        showAlert('info', 'Memulai refresh semua data (kontes, rating, submissions)...');
+        
+        const response = await fetch('{{ route("pendamping.refresh.all") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers.get('content-type'));
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Response error:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Response:', result);
+        
+        if (result.success) {
+            console.log('Refresh completed successfully, reloading page...');
+            showAlert('success', 'Semua data berhasil direfresh! Memuat ulang halaman...');
+            // Auto refresh halaman setelah 3 detik
+            setTimeout(() => location.reload(), 3000);
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('error', 'Terjadi kesalahan saat refresh data: ' + error.message);
+    } finally {
+        button.innerHTML = originalHtml;
+        button.disabled = false;
+        console.log('Button restored');
+    }
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'info' ? 'info' : 'danger'} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>

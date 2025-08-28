@@ -9,11 +9,6 @@
             <h2 class="mb-1">📅 Manajemen Kontes</h2>
             <p class="text-muted mb-0">Kelola kontes penting dan monitor partisipasi mahasiswa</p>
         </div>
-        <div>
-            <button type="button" class="btn btn-primary" onclick="location.reload()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh
-            </button>
-        </div>
     </div>
 
     <div class="row">

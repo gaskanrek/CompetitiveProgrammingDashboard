@@ -9,11 +9,6 @@
             <h2 class="mb-1">🏆 Leaderboard</h2>
             <p class="text-muted mb-0">Ranking mahasiswa berdasarkan rating Codeforces</p>
         </div>
-        <div>
-            <button type="button" class="btn btn-primary" onclick="location.reload()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh
-            </button>
-        </div>
     </div>
 
     <div class="row">

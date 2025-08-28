@@ -162,7 +162,7 @@ class CrawlCodeforcesUser extends Command
         $response = Http::timeout(30)->get('https://codeforces.com/api/user.status', [
             'handle' => $codeforcesHandle->handle,
             'from' => 1,
-            'count' => 1000 // Limit to recent 1000 submissions
+            'count' => 200 // Reduce count to get more recent submissions faster
         ]);
         
         if (!$response->successful()) {
@@ -178,10 +178,21 @@ class CrawlCodeforcesUser extends Command
         }
 
         $submissions = $data['result'];
+        $this->info("Found " . count($submissions) . " submissions to process");
+        
+        $processedCount = 0;
+        $skippedCount = 0;
         
         foreach ($submissions as $submissionData) {
-            $this->processSubmission($codeforcesHandle, $submissionData);
+            $result = $this->processSubmission($codeforcesHandle, $submissionData);
+            if ($result) {
+                $processedCount++;
+            } else {
+                $skippedCount++;
+            }
         }
+        
+        $this->info("Processed: {$processedCount}, Skipped: {$skippedCount} submissions");
     }
 
     private function processSubmission($codeforcesHandle, $submissionData)
@@ -194,29 +205,41 @@ class CrawlCodeforcesUser extends Command
                 $problem = Problem::where('contest_id', $contest->id)
                     ->where('index', $submissionData['problem']['index'])
                     ->first();
+            } else {
+                // Contest not found - this is the likely issue
+                $this->warn("Contest {$submissionData['problem']['contestId']} not found for submission {$submissionData['id']}");
             }
         }
 
         if (!$problem) {
-            return; // Skip if problem doesn't exist
+            if (isset($submissionData['problem']['contestId'])) {
+                $this->warn("Problem {$submissionData['problem']['contestId']}{$submissionData['problem']['index']} not found for submission {$submissionData['id']}");
+            }
+            return false; // Skip if problem doesn't exist
         }
 
-        Submission::updateOrCreate(
-            [
-                'submission_id' => $submissionData['id'],
-            ],
-            [
-                'codeforces_handle_id' => $codeforcesHandle->id,
-                'problem_id' => $problem->id,
-                'creation_time' => Carbon::createFromTimestamp($submissionData['creationTimeSeconds']),
-                'author_handle' => $submissionData['author']['members'][0]['handle'] ?? $codeforcesHandle->handle,
-                'programming_language' => $submissionData['programmingLanguage'],
-                'verdict' => $submissionData['verdict'] ?? 'PENDING',
-                'testset' => $submissionData['testset'] ?? 'TESTS',
-                'passed_test_count' => $submissionData['passedTestCount'] ?? 0,
-                'time_consumed_millis' => $submissionData['timeConsumedMillis'] ?? 0,
-                'memory_consumed_bytes' => $submissionData['memoryConsumedBytes'] ?? 0,
-            ]
-        );
+        try {
+            Submission::updateOrCreate(
+                [
+                    'submission_id' => $submissionData['id'],
+                ],
+                [
+                    'codeforces_handle_id' => $codeforcesHandle->id,
+                    'problem_id' => $problem->id,
+                    'creation_time' => Carbon::createFromTimestamp($submissionData['creationTimeSeconds']),
+                    'author_handle' => $submissionData['author']['members'][0]['handle'] ?? $codeforcesHandle->handle,
+                    'programming_language' => $submissionData['programmingLanguage'],
+                    'verdict' => $submissionData['verdict'] ?? 'PENDING',
+                    'testset' => $submissionData['testset'] ?? 'TESTS',
+                    'passed_test_count' => $submissionData['passedTestCount'] ?? 0,
+                    'time_consumed_millis' => $submissionData['timeConsumedMillis'] ?? 0,
+                    'memory_consumed_bytes' => $submissionData['memoryConsumedBytes'] ?? 0,
+                ]
+            );
+            return true;
+        } catch (\Exception $e) {
+            $this->error("Error saving submission {$submissionData['id']}: " . $e->getMessage());
+            return false;
+        }
     }
 }

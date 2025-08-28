@@ -63,7 +63,7 @@
                                     <td>{{ $mahasiswa->profile->major ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="fw-semibold">Tahun Lulus:</td>
+                                    <td class="fw-semibold">Angkatan:</td>
                                     <td>{{ $mahasiswa->profile->graduation_year ?? '-' }}</td>
                                 </tr>
                                 <tr>

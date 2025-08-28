@@ -25,7 +25,6 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id',
             'full_name' => 'nullable|string|max:255',
             'nim' => 'nullable|string|max:20',
             'university' => 'nullable|string|max:255',
@@ -33,11 +32,17 @@ class AuthController extends Controller
             'graduation_year' => 'nullable|integer|min:2020|max:2030',
         ]);
 
+        // Pastikan role_id selalu mahasiswa
+        $mahasiswaRole = Role::where('name', 'mahasiswa')->first();
+        if (!$mahasiswaRole) {
+            return back()->withErrors(['role_id' => 'Role mahasiswa tidak ditemukan.']);
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
+            'role_id' => $mahasiswaRole->id,
         ]);
 
         // Create user profile

@@ -57,19 +57,8 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label for="role_id" class="form-label">Role *</label>
-                                <select class="form-select @error('role_id') is-invalid @enderror" 
-                                        id="role_id" name="role_id" required>
-                                    <option value="">Pilih Role</option>
-                                    @foreach($roles as $role)
-                                        <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                            {{ $role->display_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('role_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <!-- Role hidden untuk mahasiswa saja -->
+                                <input type="hidden" name="role_id" value="{{ $roles->where('name', 'mahasiswa')->first()->id ?? 1 }}">
                             </div>
                             
                             <hr class="my-4">
@@ -116,10 +105,10 @@
                             </div>
                             
                             <div class="mb-4">
-                                <label for="graduation_year" class="form-label">Tahun Lulus</label>
+                                <label for="graduation_year" class="form-label">Angkatan</label>
                                 <select class="form-select @error('graduation_year') is-invalid @enderror" 
                                         id="graduation_year" name="graduation_year">
-                                    <option value="">Pilih Tahun</option>
+                                    <option value="">Pilih Angkatan</option>
                                     @for($year = 2020; $year <= 2030; $year++)
                                         <option value="{{ $year }}" {{ old('graduation_year') == $year ? 'selected' : '' }}>
                                             {{ $year }}

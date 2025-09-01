@@ -6,120 +6,159 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">📅 Manajemen Kontes</h2>
-            <p class="text-muted mb-0">Kelola kontes penting dan monitor partisipasi mahasiswa</p>
+            <h2 class="mb-1">📅 Kontes Mendatang</h2>
+            <p class="text-muted mb-0">Platform Monitoring Competitive Programming</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ $upcomingContests->count() }}</h4>
+                    <small>Total Kontes Mendatang</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ $upcomingContests->where('start_time', '>=', now())->where('start_time', '<=', now()->addDays(7))->count() }}</h4>
+                    <small>Kontes Minggu Ini</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ $upcomingContests->where('start_time', '>=', now())->where('start_time', '<=', now()->addDay())->count() }}</h4>
+                    <small>Kontes Hari Ini</small>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Upcoming Contests -->
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-calendar-event me-2"></i>
-                        Kontes Mendatang
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    @if($upcomingContests->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th width="45%">Nama Kontes</th>
-                                        <th width="15%">Tipe</th>
-                                        <th width="25%">Waktu Mulai</th>
-                                        <th width="15%">Durasi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($upcomingContests->take(15) as $contest)
-                                    <tr>
-                                        <td>
-                                            <div>
-                                                <a href="https://codeforces.com/contest/{{ $contest->id }}" 
-                                                   target="_blank" class="text-decoration-none fw-semibold">
-                                                    {{ $contest->name }}
-                                                    <i class="bi bi-box-arrow-up-right small"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge {{ getContestTypeBadgeClass($contest->type) }}">
-                                                {{ $contest->type }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="small">
-                                                <div class="fw-semibold">
-                                                    {{ $contest->start_time->format('d M Y') }}
-                                                </div>
-                                                <div class="text-muted">
-                                                    {{ $contest->start_time->format('H:i') }} WIB
-                                                </div>
-                                                <div class="text-info">
-                                                    {{ $contest->start_time->diffForHumans() }}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-info">
-                                                {{ $contest->getDurationFormatted() }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="bi bi-calendar-x display-4 text-muted"></i>
-                            <h5 class="mt-3">Tidak Ada Kontes Mendatang</h5>
-                            <p class="text-muted">Tidak ada kontes yang dijadwalkan dalam waktu dekat.</p>
-                        </div>
-                    @endif
-                </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Daftar Kontes Mendatang</h5>
+            <div>
+                <a href="https://codeforces.com/contests" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-box-arrow-up-right me-2"></i>Lihat di Codeforces
+                </a>
             </div>
         </div>
+        <div class="card-body">
+            @if($upcomingContests->count() > 0)
+                <div class="row">
+                    @foreach($upcomingContests as $contest)
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-start border-{{ $contest->isUpcoming() ? 'primary' : 'secondary' }} border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h6 class="card-title mb-0">
+                                            <a href="https://codeforces.com/contest/{{ $contest->contest_id }}" target="_blank" class="text-decoration-none">
+                                                {{ $contest->name }}
+                                            </a>
+                                        </h6>
+                                        <span class="badge bg-{{ $contest->phase === 'BEFORE' ? 'primary' : 'secondary' }}">
+                                            {{ $contest->phase }}
+                                        </span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="row text-center small">
+                                            <div class="col-4">
+                                                <div class="border-end">
+                                                    <div class="fw-bold text-primary">
+                                                        <i class="bi bi-calendar3"></i>
+                                                    </div>
+                                                    <div>{{ $contest->start_time->format('d M') }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="border-end">
+                                                    <div class="fw-bold text-success">
+                                                        <i class="bi bi-clock"></i>
+                                                    </div>
+                                                    <div>{{ $contest->start_time->format('H:i') }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="fw-bold text-info">
+                                                    <i class="bi bi-hourglass"></i>
+                                                </div>
+                                                <div>{{ $contest->getDurationFormatted() }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        @if($contest->start_time > now())
+                                            @php
+                                                $timeUntilStart = $contest->start_time->diffForHumans();
+                                                $isToday = $contest->start_time->isToday();
+                                                $isTomorrow = $contest->start_time->isTomorrow();
+                                            @endphp
+                                            <div class="alert alert-{{ $isToday ? 'warning' : ($isTomorrow ? 'info' : 'light') }} py-2 mb-2">
+                                                <small>
+                                                    <i class="bi bi-clock-history me-1"></i>
+                                                    Dimulai {{ $timeUntilStart }}
+                                                    @if($isToday)
+                                                        <strong>(Hari ini!)</strong>
+                                                    @elseif($isTomorrow)
+                                                        <strong>(Besok)</strong>
+                                                    @endif
+                                                </small>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    @if($contest->description)
+                                        <p class="card-text small text-muted">{{ Str::limit($contest->description, 100) }}</p>
+                                    @endif
+
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        @if($contest->difficulty)
+                                            <small class="text-muted">
+                                                Difficulty: {{ $contest->difficulty }}/5
+                                            </small>
+                                        @endif
+                                    </div>
+
+                                    <!-- Additional Info -->
+                                    @if($contest->kind || $contest->icpc_region)
+                                        <div class="mt-2">
+                                            @if($contest->kind)
+                                                <span class="badge bg-light text-dark me-1">{{ $contest->kind }}</span>
+                                            @endif
+                                            @if($contest->icpc_region)
+                                                <span class="badge bg-light text-dark">{{ $contest->icpc_region }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-x display-4 text-muted"></i>
+                    <h5 class="mt-3">Tidak ada kontes mendatang</h5>
+                    <p class="text-muted">Kontes baru akan muncul setelah data di-refresh atau dijadwalkan oleh Codeforces</p>
+                    <div class="mt-3">
+                        <a href="https://codeforces.com/contests" target="_blank" class="btn btn-primary me-2">
+                            <i class="bi bi-box-arrow-up-right me-2"></i>Cek di Codeforces
+                        </a>
+                        <a href="{{ route('dashboard') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-house me-2"></i>Kembali ke Dashboard
+                        </a>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
 </div>
-
-<style>
-.avatar-circle {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 0.75rem;
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-    color: #495057;
-}
-
-.table-warning {
-    background-color: rgba(255, 193, 7, 0.1) !important;
-}
-</style>
-
-<script>
-@php
-function getContestTypeBadgeClass($type) {
-    switch(strtoupper($type)) {
-        case 'CF': return 'bg-primary';
-        case 'IOI': return 'bg-success';
-        case 'ICPC': return 'bg-warning text-dark';
-        default: return 'bg-secondary';
-    }
-}
-@endphp
-</script>
 @endsection

@@ -129,15 +129,7 @@
                                     <p class="card-text small text-muted">{{ Str::limit($contest->description, 100) }}</p>
                                 @endif
 
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="https://codeforces.com/contest/{{ $contest->contest_id }}" target="_blank" class="btn btn-outline-primary">
-                                            <i class="bi bi-box-arrow-up-right me-1"></i>Buka
-                                        </a>
-                                        <a href="https://codeforces.com/contest/{{ $contest->contest_id }}/register" target="_blank" class="btn btn-primary">
-                                            <i class="bi bi-person-plus me-1"></i>Daftar
-                                        </a>
-                                    </div>
+                                <div class="d-flex justify-content-end align-items-center">
                                     @if($contest->difficulty)
                                         <small class="text-muted">
                                             Difficulty: {{ $contest->difficulty }}/5

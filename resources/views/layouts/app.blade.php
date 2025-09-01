@@ -13,49 +13,269 @@
     
     <!-- Custom CSS -->
     <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+        }
+
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #0f172a 100%);
+            border-right: 1px solid var(--border-color);
         }
+        
         .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 0.75rem 1rem;
-            margin: 0.25rem 0;
+            color: #cbd5e1;
+            padding: 0.875rem 1.25rem;
+            margin: 0.25rem 0.75rem;
             border-radius: 0.5rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
         }
-        .sidebar .nav-link:hover,
+        
+        .sidebar .nav-link:hover {
+            color: #ffffff;
+            background-color: var(--sidebar-hover);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        }
+        
         .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-            transform: translateX(5px);
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 4px 0 rgba(99, 102, 241, 0.2);
         }
+        
         .main-content {
-            background-color: #f8f9fa;
+            background-color: var(--light-bg);
             min-height: 100vh;
         }
+        
         .card {
-            border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             border-radius: 0.75rem;
+            background-color: var(--card-bg);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid #e9ecef;
-            border-radius: 0.75rem 0.75rem 0 0 !important;
-        }
-        .btn-primary {
-            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
-            border: none;
-        }
-        .btn-primary:hover {
-            background: linear-gradient(145deg, #5a6fd8 0%, #6a4190 100%);
+        
+        .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transform: translateY(-1px);
         }
-        .navbar {
-            background: white !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        
+        .card-header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+            padding: 1rem 1.25rem;
         }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            border: 1px solid var(--primary-color);
+            color: white;
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-hover) 0%, #3730a3 100%);
+            border-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px 0 rgba(99, 102, 241, 0.2);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+            border-color: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #d97706;
+            border-color: #d97706;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            transform: translateY(-1px);
+        }
+        
+        .navbar {
+            background-color: var(--card-bg) !important;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .bg-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%) !important;
+        }
+        
+        .bg-success {
+            background-color: var(--success-color) !important;
+        }
+        
+        .bg-warning {
+            background-color: var(--warning-color) !important;
+        }
+        
+        .bg-danger {
+            background-color: var(--danger-color) !important;
+        }
+        
+        .bg-info {
+            background-color: var(--info-color) !important;
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        .border-primary {
+            border-color: var(--primary-color) !important;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 0.75rem;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background-color: #f0fdf4;
+            border-left-color: var(--success-color);
+            color: #166534;
+        }
+        
+        .alert-danger {
+            background-color: #fef2f2;
+            border-left-color: var(--danger-color);
+            color: #991b1b;
+        }
+        
+        .alert-warning {
+            background-color: #fffbeb;
+            border-left-color: var(--warning-color);
+            color: #92400e;
+        }
+        
+        .alert-info {
+            background-color: #eff6ff;
+            border-left-color: var(--info-color);
+            color: #1e40af;
+        }
+        
+        .badge {
+            font-weight: 500;
+            border-radius: 0.375rem;
+        }
+        
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table th {
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            padding: 0.875rem;
+        }
+        
+        .table td {
+            padding: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .table tbody tr {
+            transition: background-color 0.15s ease;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+        
+        /* Dropdown styling */
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-item {
+            color: var(--text-primary);
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+        
+        /* Form controls */
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Rating colors remain the same for consistency */
         .rating-newbie { color: #808080; }
         .rating-pupil { color: #008000; }
         .rating-specialist { color: #03a89e; }
@@ -66,6 +286,21 @@
         .rating-grandmaster { color: #ff0000; }
         .rating-international-grandmaster { color: #ff0000; }
         .rating-legendary-grandmaster { color: #ff0000; }
+        
+        /* Smooth transitions for interactive elements */
+        a, button {
+            transition: color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+        }
+        
+        /* Progress bars */
+        .progress {
+            background-color: #e2e8f0;
+            border-radius: 0.5rem;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        }
     </style>
     
     @stack('styles')

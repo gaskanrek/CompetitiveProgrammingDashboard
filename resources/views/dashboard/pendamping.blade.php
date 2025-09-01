@@ -163,7 +163,7 @@
                                     <th>Mahasiswa</th>
                                     <th>Problem</th>
                                     <th>Verdict</th>
-                                    <th>Waktu</th>
+                                    <th>Submitted At</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -184,7 +184,7 @@
                                                 {{ $submission->verdict }}
                                             </span>
                                         </td>
-                                        <td>{{ $submission->creation_time->diffForHumans() }}</td>
+                                        <td>{{ $submission->creation_time->format('d M Y H:i') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

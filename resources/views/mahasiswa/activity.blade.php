@@ -38,11 +38,6 @@
                 <i class="bi bi-graph-up me-2"></i>Rating History
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="contests-tab" data-bs-toggle="tab" data-bs-target="#contests" type="button" role="tab">
-                <i class="bi bi-trophy me-2"></i>Contest Participations
-            </button>
-        </li>
     </ul>
 
     <!-- Tab Content -->
@@ -170,7 +165,7 @@
                                                     {{ $history->rating_change > 0 ? '+' : '' }}{{ $history->rating_change }}
                                                 </span>
                                             </td>
-                                            <td>{{ $history->rating_update_time->format('d M Y') }}</td>
+                                            <td>{{ $history->rating_update_time->format('d M Y H:i') }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -185,70 +180,6 @@
                             <i class="bi bi-graph-up display-4 text-muted"></i>
                             <h5 class="mt-3">Belum Ada Riwayat Rating</h5>
                             <p class="text-muted">Riwayat rating akan muncul setelah Anda mengikuti kontes di Codeforces</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Contest Participations Tab -->
-        <div class="tab-pane fade" id="contests" role="tabpanel">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Partisipasi Kontes</h5>
-                </div>
-                <div class="card-body">
-                    @if($contestParticipations->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Contest</th>
-                                        <th>Rank</th>
-                                        <th>Points</th>
-                                        <th>Penalty</th>
-                                        <th>Hacks</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($contestParticipations as $participation)
-                                        <tr>
-                                            <td>
-                                                @if($participation->contest)
-                                                    <a href="https://codeforces.com/contest/{{ $participation->contest->contest_id }}" target="_blank" class="text-decoration-none">
-                                                        {{ $participation->contest->name }}
-                                                    </a>
-                                                @else
-                                                    <span class="text-muted">Contest not found</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-{{ $participation->rank <= 100 ? 'success' : ($participation->rank <= 500 ? 'warning' : 'secondary') }}">
-                                                    #{{ number_format($participation->rank) }}
-                                                </span>
-                                            </td>
-                                            <td>{{ number_format($participation->points) }}</td>
-                                            <td>{{ number_format($participation->penalty) }}</td>
-                                            <td>
-                                                <span class="text-success">+{{ $participation->successful_hack_count }}</span> / 
-                                                <span class="text-danger">-{{ $participation->unsuccessful_hack_count }}</span>
-                                            </td>
-                                            <td>{{ $participation->participation_time->format('d M Y') }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="d-flex justify-content-center">
-                            {{ $contestParticipations->appends(request()->except('contests_page'))->appends(['tab' => 'contests'])->links('pagination.custom') }}
-                        </div>
-                    @else
-                        <div class="text-center py-4">
-                            <i class="bi bi-trophy display-4 text-muted"></i>
-                            <h5 class="mt-3">Belum Ada Partisipasi Kontes</h5>
-                            <p class="text-muted">Partisipasi kontes akan muncul setelah Anda mengikuti kontes di Codeforces</p>
                         </div>
                     @endif
                 </div>

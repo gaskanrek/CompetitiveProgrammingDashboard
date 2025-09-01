@@ -46,7 +46,7 @@
                                         <th width="30%">Problem</th>
                                         <th width="15%">Bahasa</th>
                                         <th width="15%">Verdict</th>
-                                        <th width="15%">Waktu</th>
+                                        <th width="15%">Submitted At</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -85,7 +85,7 @@
                                             </span>
                                         </td>
                                         <td class="text-muted small">
-                                            {{ $submission->creation_time->diffForHumans() }}
+                                            {{ $submission->creation_time->format('d M Y H:i') }}
                                         </td>
                                     </tr>
                                     @endforeach
@@ -165,7 +165,7 @@
                                             </span>
                                         </td>
                                         <td class="text-muted small">
-                                            {{ $rating->rating_update_time->diffForHumans() }}
+                                            {{ $rating->rating_update_time->format('d M Y H:i') }}
                                         </td>
                                     </tr>
                                     @endforeach

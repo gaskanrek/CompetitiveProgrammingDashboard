@@ -99,7 +99,7 @@
                                             <div class="fw-bold text-info">
                                                 <i class="bi bi-hourglass"></i>
                                             </div>
-                                            <div>{{ $contest->getDurationInHours() }}h</div>
+                                            <div>{{ $contest->getDurationFormatted() }}</div>
                                         </div>
                                     </div>
                                 </div>

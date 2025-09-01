@@ -93,4 +93,32 @@ class Contest extends Model
     {
         return $this->duration_seconds ? $this->duration_seconds / 3600 : 0;
     }
+
+    /**
+     * Get contest duration in HH:MM format like Codeforces.
+     * For very long contests (>24 hours), show in days format.
+     */
+    public function getDurationFormatted(): string
+    {
+        if (!$this->duration_seconds) {
+            return '00:00';
+        }
+        
+        $hours = floor($this->duration_seconds / 3600);
+        $minutes = floor(($this->duration_seconds % 3600) / 60);
+        
+        // If duration is more than 24 hours, show in days format
+        if ($hours >= 24) {
+            $days = floor($hours / 24);
+            $remainingHours = $hours % 24;
+            
+            if ($remainingHours == 0) {
+                return $days . ' hari';
+            } else {
+                return $days . 'd ' . sprintf('%02d:%02d', $remainingHours, $minutes);
+            }
+        }
+        
+        return sprintf('%02d:%02d', $hours, $minutes);
+    }
 }

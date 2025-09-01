@@ -227,7 +227,7 @@
                                     <i class="bi bi-calendar me-1"></i>{{ $contest->start_time->format('d M, H:i') }}
                                 </small>
                             </div>
-                            <span class="badge bg-primary">{{ $contest->getDurationInHours() }}h</span>
+                            <span class="badge bg-primary">{{ $contest->getDurationFormatted() }}</span>
                         </div>
                     @endforeach
                 @else

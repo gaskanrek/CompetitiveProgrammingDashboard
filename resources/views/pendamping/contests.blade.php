@@ -65,7 +65,7 @@
                                         </td>
                                         <td>
                                             <span class="badge bg-info">
-                                                {{ gmdate('H:i', $contest->duration_seconds) }}
+                                                {{ $contest->getDurationFormatted() }}
                                             </span>
                                         </td>
                                     </tr>

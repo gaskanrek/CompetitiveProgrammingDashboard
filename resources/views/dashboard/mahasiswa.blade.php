@@ -166,7 +166,7 @@
                                 </h6>
                                 <small class="text-muted">
                                     <i class="bi bi-calendar me-1"></i>{{ $contest->start_time->format('d M Y, H:i') }}
-                                    <i class="bi bi-clock ms-2 me-1"></i>{{ $contest->getDurationInHours() }} jam
+                                    <i class="bi bi-clock ms-2 me-1"></i>{{ $contest->getDurationFormatted() }}
                                 </small>
                             </div>
                             <span class="badge bg-{{ $contest->phase === 'BEFORE' ? 'primary' : 'secondary' }}">

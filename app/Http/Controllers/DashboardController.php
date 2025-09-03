@@ -33,12 +33,20 @@ class DashboardController extends Controller
         $user = Auth::user();
         $codeforcesHandle = $user->primaryCodeforcesHandle;
         
+        // Current ongoing contests
+        $currentContests = Contest::where('phase', 'CODING')
+            ->orderBy('start_time')
+            ->get();
+            
         // Upcoming contests
         $upcomingContests = Contest::where('phase', 'BEFORE')
             ->where('start_time', '>', now())
             ->orderBy('start_time')
             ->limit(5)
             ->get();
+
+        // Merge current and upcoming for display
+        $allContests = $currentContests->merge($upcomingContests)->take(5);
 
         // Get leaderboard data (top 5)
         $leaderboard = CodeforcesHandle::with('user.profile')
@@ -71,6 +79,8 @@ class DashboardController extends Controller
             'user',
             'codeforcesHandle',
             'upcomingContests',
+            'allContests',
+            'currentContests',
             'recentSubmissions',
             'ratingHistory',
             'solvedProblemsCount',
@@ -99,12 +109,20 @@ class DashboardController extends Controller
             ->limit(15)
             ->get();
 
+        // Current ongoing contests
+        $currentContests = Contest::where('phase', 'CODING')
+            ->orderBy('start_time')
+            ->get();
+
         // Upcoming contests
         $upcomingContests = Contest::where('phase', 'BEFORE')
             ->where('start_time', '>', now())
             ->orderBy('start_time')
             ->limit(10)
             ->get();
+
+        // Merge current and upcoming contests for display
+        $allContests = $currentContests->merge($upcomingContests)->take(10);
 
         // Statistics
         $totalMahasiswa = $mahasiswaUsers->count();
@@ -117,6 +135,8 @@ class DashboardController extends Controller
             'leaderboard',
             'recentSubmissions',
             'upcomingContests',
+            'allContests',
+            'currentContests',
             'totalMahasiswa',
             'activeMahasiswa'
         ));

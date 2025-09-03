@@ -202,17 +202,17 @@
 
     <!-- Right Column -->
     <div class="col-md-4">
-        <!-- Upcoming Contests -->
+        <!-- Contests -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Kontes Mendatang</h5>
+                <h5 class="mb-0">Kontes Berlangsung & Mendatang</h5>
                 <a href="{{ route('pendamping.contests') }}" class="btn btn-sm btn-outline-primary">
                     Kelola
                 </a>
             </div>
             <div class="card-body">
-                @if($upcomingContests->count() > 0)
-                    @foreach($upcomingContests->take(5) as $contest)
+                @if($allContests->count() > 0)
+                    @foreach($allContests->take(5) as $contest)
                         <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                             <div>
                                 <h6 class="mb-1">
@@ -225,15 +225,22 @@
                                 </h6>
                                 <small class="text-muted">
                                     <i class="bi bi-calendar me-1"></i>{{ $contest->start_time->format('d M, H:i') }}
+                                    @if($contest->phase === 'CODING')
+                                        <br><strong class="text-danger">
+                                            <i class="bi bi-play-circle-fill me-1"></i>SEDANG BERLANGSUNG!
+                                        </strong>
+                                    @endif
                                 </small>
                             </div>
-                            <span class="badge bg-primary">{{ $contest->getDurationFormatted() }}</span>
+                            <span class="badge bg-{{ $contest->phase === 'CODING' ? 'danger' : 'primary' }}">
+                                {{ $contest->phase === 'CODING' ? 'BERLANGSUNG' : $contest->getDurationFormatted() }}
+                            </span>
                         </div>
                     @endforeach
                 @else
                     <div class="text-center py-4">
                         <i class="bi bi-calendar-x display-4 text-muted"></i>
-                        <p class="text-muted mt-2">Tidak ada kontes mendatang</p>
+                        <p class="text-muted mt-2">Tidak ada kontes berlangsung atau mendatang</p>
                     </div>
                 @endif
             </div>

@@ -140,11 +140,34 @@ class MahasiswaController extends Controller
 
     public function contests()
     {
+        // Get upcoming contests (BEFORE phase)
         $upcomingContests = \App\Models\Contest::where('phase', 'BEFORE')
             ->where('start_time', '>', now())
             ->orderBy('start_time')
-            ->paginate(10);
+            ->get();
 
-        return view('mahasiswa.contests', compact('upcomingContests'));
+        // Get current ongoing contests (CODING phase)
+        $currentContests = \App\Models\Contest::where('phase', 'CODING')
+            ->orderBy('start_time')
+            ->get();
+
+        // Merge current and upcoming contests for pagination
+        $allContests = $currentContests->merge($upcomingContests);
+        
+        // Manual pagination since we're merging collections
+        $perPage = 10;
+        $currentPage = request()->get('page', 1);
+        $total = $allContests->count();
+        $items = $allContests->forPage($currentPage, $perPage);
+        
+        $paginatedContests = new \Illuminate\Pagination\LengthAwarePaginator(
+            $items,
+            $total,
+            $perPage,
+            $currentPage,
+            ['path' => request()->url()]
+        );
+
+        return view('mahasiswa.contests', compact('paginatedContests', 'currentContests', 'upcomingContests'));
     }
 }

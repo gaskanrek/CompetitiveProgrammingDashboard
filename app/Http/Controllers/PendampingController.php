@@ -101,12 +101,21 @@ class PendampingController extends Controller
 
     public function contests()
     {
+        // Get upcoming contests (BEFORE phase)
         $upcomingContests = Contest::where('phase', 'BEFORE')
             ->where('start_time', '>', now())
             ->orderBy('start_time')
             ->get();
 
-        return view('pendamping.contests', compact('upcomingContests'));
+        // Get current ongoing contests (CODING phase)
+        $currentContests = Contest::where('phase', 'CODING')
+            ->orderBy('start_time')
+            ->get();
+
+        // Merge current and upcoming contests
+        $allContests = $currentContests->merge($upcomingContests);
+
+        return view('pendamping.contests', compact('allContests', 'currentContests', 'upcomingContests'));
     }
 
     public function settings()

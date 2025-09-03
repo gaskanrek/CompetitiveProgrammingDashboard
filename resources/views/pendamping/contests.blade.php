@@ -6,13 +6,21 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-1">📅 Kontes Mendatang</h2>
+            <h2 class="mb-1">📅 Kontes Mendatang & Berlangsung</h2>
             <p class="text-muted mb-0">Platform Monitoring Competitive Programming</p>
         </div>
     </div>
 
     <!-- Quick Stats -->
     <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h4 class="mb-0">{{ $currentContests->count() }}</h4>
+                    <small>Kontes Berlangsung</small>
+                </div>
+            </div>
+        </div>
         <div class="col-md-4">
             <div class="card bg-primary text-white">
                 <div class="card-body text-center">
@@ -29,20 +37,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h4 class="mb-0">{{ $upcomingContests->where('start_time', '>=', now())->where('start_time', '<=', now()->addDay())->count() }}</h4>
-                    <small>Kontes Hari Ini</small>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Upcoming Contests -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar Kontes Mendatang</h5>
+            <h5 class="mb-0">Daftar Kontes Berlangsung & Mendatang</h5>
             <div>
                 <a href="https://codeforces.com/contests" target="_blank" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-box-arrow-up-right me-2"></i>Lihat di Codeforces
@@ -50,11 +50,11 @@
             </div>
         </div>
         <div class="card-body">
-            @if($upcomingContests->count() > 0)
+            @if($allContests->count() > 0)
                 <div class="row">
-                    @foreach($upcomingContests as $contest)
+                    @foreach($allContests as $contest)
                         <div class="col-md-6 mb-4">
-                            <div class="card border-start border-{{ $contest->isUpcoming() ? 'primary' : 'secondary' }} border-4 h-100">
+                            <div class="card border-start border-{{ $contest->phase === 'CODING' ? 'danger' : ($contest->isUpcoming() ? 'primary' : 'secondary') }} border-4 h-100">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <h6 class="card-title mb-0">
@@ -62,8 +62,8 @@
                                                 {{ $contest->name }}
                                             </a>
                                         </h6>
-                                        <span class="badge bg-{{ $contest->phase === 'BEFORE' ? 'primary' : 'secondary' }}">
-                                            {{ $contest->phase }}
+                                        <span class="badge bg-{{ $contest->phase === 'CODING' ? 'danger' : ($contest->phase === 'BEFORE' ? 'primary' : 'secondary') }}">
+                                            {{ $contest->phase === 'CODING' ? 'BERLANGSUNG' : $contest->phase }}
                                         </span>
                                     </div>
 
@@ -95,7 +95,19 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        @if($contest->start_time > now())
+                                        @if($contest->phase === 'CODING')
+                                            @php
+                                                $endTime = $contest->start_time->addSeconds($contest->duration_seconds);
+                                                $timeRemaining = $endTime->diffForHumans();
+                                            @endphp
+                                            <div class="alert alert-danger py-2 mb-2">
+                                                <small>
+                                                    <i class="bi bi-play-circle-fill me-1"></i>
+                                                    <strong>SEDANG BERLANGSUNG!</strong><br>
+                                                    Berakhir {{ $timeRemaining }}
+                                                </small>
+                                            </div>
+                                        @elseif($contest->start_time > now())
                                             @php
                                                 $timeUntilStart = $contest->start_time->diffForHumans();
                                                 $isToday = $contest->start_time->isToday();
@@ -146,7 +158,7 @@
             @else
                 <div class="text-center py-5">
                     <i class="bi bi-calendar-x display-4 text-muted"></i>
-                    <h5 class="mt-3">Tidak ada kontes mendatang</h5>
+                    <h5 class="mt-3">Tidak ada kontes berlangsung atau mendatang</h5>
                     <p class="text-muted">Kontes baru akan muncul setelah data di-refresh atau dijadwalkan oleh Codeforces</p>
                     <div class="mt-3">
                         <a href="https://codeforces.com/contests" target="_blank" class="btn btn-primary me-2">

@@ -146,17 +146,17 @@
             </div>
         @endif
 
-        @if($upcomingContests->count() > 0)
-            <!-- Upcoming Contests -->
+        @if($allContests->count() > 0)
+            <!-- Contests -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Kontes Mendatang</h5>
+                    <h5 class="mb-0">Kontes Berlangsung & Mendatang</h5>
                     <a href="{{ route('mahasiswa.contests') }}" class="btn btn-sm btn-outline-primary">
                         Lihat Semua
                     </a>
                 </div>
                 <div class="card-body">
-                    @foreach($upcomingContests as $contest)
+                    @foreach($allContests as $contest)
                         <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                             <div>
                                 <h6 class="mb-1">
@@ -167,10 +167,15 @@
                                 <small class="text-muted">
                                     <i class="bi bi-calendar me-1"></i>{{ $contest->start_time->format('d M Y, H:i') }}
                                     <i class="bi bi-clock ms-2 me-1"></i>{{ $contest->getDurationFormatted() }}
+                                    @if($contest->phase === 'CODING')
+                                        <br><strong class="text-danger">
+                                            <i class="bi bi-play-circle-fill me-1"></i>SEDANG BERLANGSUNG!
+                                        </strong>
+                                    @endif
                                 </small>
                             </div>
-                            <span class="badge bg-{{ $contest->phase === 'BEFORE' ? 'primary' : 'secondary' }}">
-                                {{ $contest->phase }}
+                            <span class="badge bg-{{ $contest->phase === 'CODING' ? 'danger' : ($contest->phase === 'BEFORE' ? 'primary' : 'secondary') }}">
+                                {{ $contest->phase === 'CODING' ? 'BERLANGSUNG' : $contest->phase }}
                             </span>
                         </div>
                     @endforeach

@@ -199,11 +199,11 @@
                         <table class="table table-sm mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="ps-3">#</th>
-                                    <th>Mahasiswa</th>
-                                    <th>Handle</th>
-                                    <th>Rating</th>
-                                    <th>Rank</th>
+                                    <th width="8%" class="ps-3">#</th>
+                                    <th width="35%">Mahasiswa</th>
+                                    <th width="25%">Handle</th>
+                                    <th width="17%">Rating</th>
+                                    <th width="15%">Rank</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -221,9 +221,9 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div>
-                                                    <div class="fw-medium">{{ $handle->user->name }}</div>
-                                                    @if($handle->user->profile)
-                                                        <small class="text-muted">{{ $handle->user->profile->angkatan ?? '' }}</small>
+                                                    <div class="fw-medium small">{{ Str::limit($handle->user->name, 20) }}</div>
+                                                    @if($handle->user->profile && $handle->user->profile->angkatan)
+                                                        <small class="text-muted">{{ $handle->user->profile->angkatan }}</small>
                                                     @endif
                                                 </div>
                                             </div>
@@ -231,18 +231,18 @@
                                         <td>
                                             <a href="https://codeforces.com/profile/{{ $handle->handle }}" 
                                                target="_blank" 
-                                               class="text-decoration-none fw-medium">
-                                                {{ $handle->handle }}
+                                               class="text-decoration-none fw-medium small">
+                                                {{ Str::limit($handle->handle, 15) }}
                                             </a>
                                         </td>
                                         <td>
-                                            <span class="fw-bold" style="color: {{ $handle->rating_color }}">
+                                            <span class="fw-bold small" style="color: {{ $handle->rating_color }}">
                                                 {{ number_format($handle->current_rating) }}
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge" style="background-color: {{ $handle->rank_color }}; color: white;">
-                                                {{ $handle->rank }}
+                                            <span class="badge small" style="background-color: {{ $handle->rank_color }}; color: white; font-size: 0.7rem;">
+                                                {{ Str::limit($handle->rank, 12) }}
                                             </span>
                                         </td>
                                     </tr>

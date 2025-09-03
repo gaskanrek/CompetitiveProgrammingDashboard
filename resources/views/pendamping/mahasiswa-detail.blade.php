@@ -118,7 +118,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title">Rank</h6>
-                            <h4 class="mb-0">{{ ucfirst($handle->current_rank ?? 'unrated') }}</h4>
+                            <h4 class="mb-0">{{ ucfirst($handle->rank ?? 'unrated') }}</h4>
                             @if($handle->max_rank)
                             <small>Max: {{ ucfirst($handle->max_rank) }}</small>
                             @endif

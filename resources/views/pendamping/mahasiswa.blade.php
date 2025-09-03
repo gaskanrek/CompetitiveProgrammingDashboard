@@ -89,9 +89,9 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($mahasiswa->primaryCodeforcesHandle && $mahasiswa->primaryCodeforcesHandle->current_rank)
-                                                <span class="badge {{ getRankBadgeClass($mahasiswa->primaryCodeforcesHandle->current_rank) }}">
-                                                    {{ ucfirst($mahasiswa->primaryCodeforcesHandle->current_rank) }}
+                                            @if($mahasiswa->primaryCodeforcesHandle && $mahasiswa->primaryCodeforcesHandle->rank)
+                                                <span class="badge {{ getRankBadgeClass($mahasiswa->primaryCodeforcesHandle->rank) }}">
+                                                    {{ ucfirst($mahasiswa->primaryCodeforcesHandle->rank) }}
                                                 </span>
                                             @else
                                                 <span class="text-muted">-</span>

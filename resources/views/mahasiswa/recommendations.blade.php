@@ -153,10 +153,7 @@
                         Coba tingkatkan target rating atau lihat soal dengan level yang lebih tinggi
                     </p>
                     <div class="mt-3">
-                        <a href="?rating={{ $currentRating }}-{{ $currentRating + 400 }}" class="btn btn-primary me-2">
-                            Coba Level Lebih Tinggi
-                        </a>
-                        <a href="{{ route('mahasiswa.contests') }}" class="btn btn-outline-primary">
+                        <a href="{{ route('mahasiswa.contests') }}" class="btn btn-primary">
                             Lihat Kontes Mendatang
                         </a>
                     </div>

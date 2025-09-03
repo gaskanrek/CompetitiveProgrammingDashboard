@@ -123,12 +123,12 @@
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th width="30%">Mahasiswa</th>
+                                        <th width="25%">Mahasiswa</th>
                                         <th width="20%">Contest</th>
-                                        <th width="15%">Old Rating</th>
-                                        <th width="15%">New Rating</th>
-                                        <th width="15%">Perubahan</th>
-                                        <th width="15%">Tanggal</th>
+                                        <th width="12%">Old Rating</th>
+                                        <th width="12%">New Rating</th>
+                                        <th width="11%">Perubahan</th>
+                                        <th width="20%">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -164,7 +164,7 @@
                                                 {{ $change >= 0 ? '+' : '' }}{{ $change }}
                                             </span>
                                         </td>
-                                        <td class="text-muted small">
+                                        <td class="text-muted small" style="white-space: nowrap;">
                                             {{ $rating->rating_update_time->format('d M Y H:i') }}
                                         </td>
                                     </tr>

@@ -43,11 +43,73 @@
         <div class="card bg-success text-white">
             <div class="card-body text-center">
                 <h4 class="mb-0">{{ $upcomingContests->where('start_time', '>=', now())->where('start_time', '<=', now()->addDays(7))->count() }}</h4>
-                <small>Kontes Minggu Ini</small>
+                <small>Kontes Terdekat</small>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Telegram Channel Updates -->
+@if(!empty($telegramMessages))
+<div class="card mb-4">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">
+            <i class="bi bi-telegram me-2"></i>
+            Update dari Channel Telegram
+        </h6>
+        <small>{{ count($telegramMessages) }} pesan terbaru</small>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            @foreach($telegramMessages as $message)
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-chat-left-text"></i>
+                                    {{ $message['chat_title'] }}
+                                </small>
+                                <div class="text-end">
+                                    <small class="text-muted d-block">
+                                        {{ $message['date']->diffForHumans() }}
+                                    </small>
+                                    @if(isset($message['expires_at']) && $message['expires_at'])
+                                        <small class="badge bg-{{ $message['is_near_expiry'] ? 'warning' : 'secondary' }} opacity-75">
+                                            <i class="bi bi-clock"></i>
+                                            Expire {{ $message['expires_at']->diffForHumans() }}
+                                        </small>
+                                    @endif
+                                </div>
+                            </div>
+                            <p class="mb-2 small">{{ Str::limit($message['text'], 150) }}</p>
+                            @if($message['forward_from'])
+                                <small class="text-info">
+                                    <i class="bi bi-arrow-right"></i>
+                                    Diteruskan dari {{ $message['forward_from'] }}
+                                </small>
+                            @endif
+                            @php
+                                $telegramService = new \App\Services\TelegramService();
+                                $urls = $telegramService->extractUrls($message);
+                            @endphp
+                            @if(!empty($urls))
+                                <div class="mt-2">
+                                    @foreach($urls as $url)
+                                        <a href="{{ $url }}" target="_blank" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-link-45deg"></i> Link
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- Contests List -->
 <div class="card">

@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/activities', [PendampingController::class, 'activities'])->name('activities');
         Route::get('/contests', [PendampingController::class, 'contests'])->name('contests');
         Route::post('/contests/{contest}/important', [PendampingController::class, 'toggleContestImportant'])->name('contests.important');
+        Route::post('/telegram/refresh', [PendampingController::class, 'refreshTelegramMessages'])->name('telegram.refresh');
         Route::get('/settings', [PendampingController::class, 'settings'])->name('settings');
         Route::post('/settings/profile', [PendampingController::class, 'updateProfile'])->name('settings.profile');
         Route::post('/settings/password', [PendampingController::class, 'updatePassword'])->name('settings.password');

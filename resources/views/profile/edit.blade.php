@@ -60,7 +60,9 @@
                                        value="{{ old('full_name', $user->userProfile->full_name ?? '') }}">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="nim" class="form-label">NIM</label>
+                                <label for="nim" class="form-label">
+                                    {{ $user->role && $user->role->name === 'pendamping' ? 'NIP' : 'NIM' }}
+                                </label>
                                 <input type="text" class="form-control" id="nim" name="nim" 
                                        value="{{ old('nim', $user->userProfile->nim ?? '') }}">
                             </div>

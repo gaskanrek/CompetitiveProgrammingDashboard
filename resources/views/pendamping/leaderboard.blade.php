@@ -79,7 +79,7 @@
                                             </a>
                                         </td>
                                         <td>
-                                            <div class="fw-bold fs-5 rating-{{ str_replace(' ', '-', strtolower($handle->current_rank ?? 'unrated')) }}">
+                                            <div class="fw-bold fs-5 rating-{{ str_replace(' ', '-', strtolower($handle->rank ?? 'unrated')) }}">
                                                 {{ number_format($handle->current_rating ?? 0) }}
                                             </div>
                                         </td>
@@ -89,10 +89,10 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge {{ getRankBadgeClass($handle->current_rank) }}">
-                                                {{ ucwords(str_replace('_', ' ', $handle->current_rank ?? 'unrated')) }}
+                                            <span class="badge {{ getRankBadgeClass($handle->rank) }}">
+                                                {{ ucwords(str_replace('_', ' ', $handle->rank ?? 'unrated')) }}
                                             </span>
-                                            @if($handle->max_rank && $handle->max_rank !== $handle->current_rank)
+                                            @if($handle->max_rank && $handle->max_rank !== $handle->rank)
                                                 <div class="text-muted small">
                                                     Best: {{ ucwords(str_replace('_', ' ', $handle->max_rank)) }}
                                                 </div>

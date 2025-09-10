@@ -112,10 +112,41 @@ class PendampingController extends Controller
             ->orderBy('start_time')
             ->get();
 
+        // Get contest-related messages from database
+        $telegramMessages = [];
+        try {
+            $telegramService = new \App\Services\TelegramService();
+            $telegramMessages = $telegramService->getContestMessagesFromDB(5);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to fetch Telegram messages from DB: ' . $e->getMessage());
+        }
+
         // Merge current and upcoming contests
         $allContests = $currentContests->merge($upcomingContests);
 
-        return view('pendamping.contests', compact('allContests', 'currentContests', 'upcomingContests'));
+        return view('pendamping.contests', compact('allContests', 'currentContests', 'upcomingContests', 'telegramMessages'));
+    }
+
+    public function refreshTelegramMessages()
+    {
+        try {
+            $telegramService = new \App\Services\TelegramService();
+            $savedCount = $telegramService->fetchAndSaveMessages(10);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan Telegram berhasil diperbarui dan disimpan!',
+                'count' => $savedCount
+            ]);
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to refresh Telegram messages: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui pesan Telegram: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function settings()

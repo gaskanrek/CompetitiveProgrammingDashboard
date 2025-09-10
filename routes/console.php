@@ -19,6 +19,17 @@ Schedule::command('codeforces:crawl-all')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/crawler.log'));
 
+// Telegram message management
+Schedule::command('telegram:expire')
+    ->hourly() // Check for expired messages every hour
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/telegram.log'));
+
+Schedule::command('telegram:fetch')
+    ->everyThreeHours() // Fetch new messages every 3 hours
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/telegram.log'));
+
 // Clean up old logs
 Schedule::command('log:clear')
     ->monthly()

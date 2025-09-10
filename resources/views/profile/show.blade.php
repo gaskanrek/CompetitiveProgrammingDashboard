@@ -45,7 +45,9 @@
                             <p class="mb-0">{{ $user->email }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="fw-bold text-muted small">NIM</label>
+                            <label class="fw-bold text-muted small">
+                                {{ $user->role && $user->role->name === 'pendamping' ? 'NIP' : 'NIM' }}
+                            </label>
                             <p class="mb-0">{{ $user->userProfile->nim ?? '-' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">

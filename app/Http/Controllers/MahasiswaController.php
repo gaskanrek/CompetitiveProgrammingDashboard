@@ -151,6 +151,15 @@ class MahasiswaController extends Controller
             ->orderBy('start_time')
             ->get();
 
+        // Get contest-related messages from database
+        $telegramMessages = [];
+        try {
+            $telegramService = new \App\Services\TelegramService();
+            $telegramMessages = $telegramService->getContestMessagesFromDB(5);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to fetch Telegram messages from DB: ' . $e->getMessage());
+        }
+
         // Merge current and upcoming contests for pagination
         $allContests = $currentContests->merge($upcomingContests);
         
@@ -168,6 +177,6 @@ class MahasiswaController extends Controller
             ['path' => request()->url()]
         );
 
-        return view('mahasiswa.contests', compact('paginatedContests', 'currentContests', 'upcomingContests'));
+        return view('mahasiswa.contests', compact('paginatedContests', 'currentContests', 'upcomingContests', 'telegramMessages'));
     }
 }

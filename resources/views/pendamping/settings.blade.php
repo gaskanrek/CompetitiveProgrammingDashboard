@@ -37,10 +37,10 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="nim" class="form-label">NIM</label>
+                            <label for="nim" class="form-label">NIP</label>
                             <input type="text" class="form-control" id="nim" name="nim" 
                                    value="{{ Auth::user()->nim }}" readonly>
-                            <div class="form-text">NIM tidak dapat diubah</div>
+                            <div class="form-text">NIP tidak dapat diubah</div>
                         </div>
                         
                         <div class="mb-3">

@@ -104,8 +104,8 @@ class TelegramMessage extends Model
      */
     public static function createFromTelegramData(array $telegramMessage): self
     {
-        // Auto-set expiry (7 hari dari tanggal pesan)
-        $expiresAt = $telegramMessage['date']->copy()->addDays(7);
+        // Auto-set expiry (3 hari dari tanggal pesan)
+        $expiresAt = $telegramMessage['date']->copy()->addDays(3);
         
         return self::updateOrCreate(
             ['telegram_message_id' => $telegramMessage['id']],

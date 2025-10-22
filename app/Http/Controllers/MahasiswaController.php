@@ -155,7 +155,7 @@ class MahasiswaController extends Controller
         $telegramMessages = [];
         try {
             $telegramService = new \App\Services\TelegramService();
-            $telegramMessages = $telegramService->getContestMessagesFromDB(5);
+            $telegramMessages = $telegramService->getContestMessagesFromDB(10);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning('Failed to fetch Telegram messages from DB: ' . $e->getMessage());
         }

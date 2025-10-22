@@ -26,8 +26,8 @@ return [
     |--------------------------------------------------------------------------
     */
     
-    'max_messages' => 10,
-    'expiry_days' => env('TELEGRAM_EXPIRY_DAYS', 7), // Auto-expire setelah X hari
+    'max_messages' => 15,
+    'expiry_days' => env('TELEGRAM_EXPIRY_DAYS', 3), // Auto-expire setelah X hari
     'contest_keywords' => [
         'contest', 'kontes', 'competition', 'kompetisi', 
         'round', 'div', 'educational', 'global',

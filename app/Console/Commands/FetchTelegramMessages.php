@@ -20,7 +20,7 @@ class FetchTelegramMessages extends Command
             $telegramService = new TelegramService();
             
             // Fetch and save to database
-            $savedCount = $telegramService->fetchAndSaveMessages(10);
+            $savedCount = $telegramService->fetchAndSaveMessages(15);
             
             if ($savedCount === 0) {
                 $this->warn('No new contest-related messages found');
@@ -30,7 +30,7 @@ class FetchTelegramMessages extends Command
             $this->info('✅ Successfully fetched and saved ' . $savedCount . ' messages to database');
             
             // Display recent messages from database
-            $recentMessages = $telegramService->getContestMessagesFromDB(5);
+            $recentMessages = $telegramService->getContestMessagesFromDB(10);
             foreach ($recentMessages as $index => $message) {
                 $this->line(($index + 1) . '. ' . \Str::limit($message['text'], 80) . ' (' . $message['date']->diffForHumans() . ')');
             }

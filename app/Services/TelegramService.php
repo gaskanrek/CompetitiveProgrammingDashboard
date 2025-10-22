@@ -71,7 +71,7 @@ class TelegramService
     /**
      * Get contest-related messages from database
      */
-    public function getContestMessagesFromDB($limit = 5)
+    public function getContestMessagesFromDB($limit = 10)
     {
         return TelegramMessage::active()
             ->contestRelated()
@@ -97,7 +97,7 @@ class TelegramService
     /**
      * Fetch and save messages to database
      */
-    public function fetchAndSaveMessages($limit = 10)
+    public function fetchAndSaveMessages($limit = 15)
     {
         try {
             // Get messages from Telegram

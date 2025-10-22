@@ -116,7 +116,7 @@ class PendampingController extends Controller
         $telegramMessages = [];
         try {
             $telegramService = new \App\Services\TelegramService();
-            $telegramMessages = $telegramService->getContestMessagesFromDB(5);
+            $telegramMessages = $telegramService->getContestMessagesFromDB(10);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning('Failed to fetch Telegram messages from DB: ' . $e->getMessage());
         }
@@ -131,7 +131,7 @@ class PendampingController extends Controller
     {
         try {
             $telegramService = new \App\Services\TelegramService();
-            $savedCount = $telegramService->fetchAndSaveMessages(10);
+            $savedCount = $telegramService->fetchAndSaveMessages(15);
             
             return response()->json([
                 'success' => true,
